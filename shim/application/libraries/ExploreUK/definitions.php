@@ -29,7 +29,7 @@ define('EUK_HIT_FIELDS', array(
     'title' => 'title_display',
     'thumb' => 'thumbnail_url_s',
     'source' => 'source_s',
-    'pubdate' => 'pub_date_sort',
+    'pubdate' => 'pub_date',
     'pubdate_display' => 'pub_date_display',
     'format' => 'format',
 ));
@@ -48,6 +48,7 @@ define('EUK_LOCALE', array(
         'id' => 'Permalink',
         'language_display' => 'Language',
         'mets_url_display' => 'XML Metadata',
+        'pub_date' => 'Date',
         'pub_date_sort' => 'Date',
         'pub_date_display' => 'Date',
         'publisher_display' => 'Publisher',

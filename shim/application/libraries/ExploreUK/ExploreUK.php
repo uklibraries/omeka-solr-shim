@@ -18,7 +18,7 @@ class ExploreUK
         }
         if ($this->omeka->getThemeOption('euk_dip_store_base_url') === 'https://nyx.uky.edu/dips') {
             $this->config['prod'] = true;
-        } else if ($this->omeka->getThemeOption('euk_dip_store_base_url') === 'https://exploreuk.uky.edu/dips') {
+        } elseif ($this->omeka->getThemeOption('euk_dip_store_base_url') === 'https://exploreuk.uky.edu/dips') {
             $this->config['prod'] = true;
         } else {
             $this->config['prod'] = false;
@@ -80,22 +80,24 @@ class ExploreUK
         }
     }
 
-    public function cleanup_host($value) {
+    public function cleanupHost($value)
+    {
         $value = preg_replace('#https://nyx#', 'https://exploreuk', $value);
         return $value;
     }
 
-    public function cleanup_doc($doc) {
+    public function cleanupDoc($doc)
+    {
         if ($this->config['prod']) {
             $result = array();
             foreach ($doc as $key => $value) {
                 if (is_string($value)) {
-                    $value = $this->cleanup_host($value);
+                    $value = $this->cleanupHost($value);
                     $result[$key] = $value;
                 } elseif (is_array($value)) {
                     $result[$key] = array();
                     foreach ($value as $item) {
-                        $item = $this->cleanup_host($item);
+                        $item = $this->cleanupHost($item);
                         $result[$key][] = $item;
                     }
                 }
@@ -131,13 +133,14 @@ class ExploreUK
         return $result;
     }
 
-    public function cleanup_docs($docs) {
+    public function cleanupDocs($docs)
+    {
         #if ($this->config['prod']) {
         #    return $docs;
         #}
         $result = array();
         foreach ($docs as $doc) {
-            $result[] = $this->cleanup_doc($doc);
+            $result[] = $this->cleanupDoc($doc);
         }
         return $result;
     }
@@ -152,7 +155,7 @@ class ExploreUK
         $url = $this->config['solr'] . '?' . $query;
         $result = json_decode(file_get_contents($url), true);
         if (isset($result['response']) and count($result['response']['docs']) > 0) {
-            return $this->cleanup_doc($result['response']['docs'][0]);
+            return $this->cleanupDoc($result['response']['docs'][0]);
         } else {
             return null;
         }
@@ -177,7 +180,7 @@ class ExploreUK
         $url = $this->config['solr'] . '?' . $query;
         $result = json_decode(file_get_contents($url), true);
         if (isset($result['response']) and count($result['response']['docs']) > 0) {
-            return $this->cleanup_docs($result['response']['docs']);
+            return $this->cleanupDocs($result['response']['docs']);
         } else {
             return null;
         }
@@ -225,7 +228,7 @@ class ExploreUK
                                 'page' => intval($doc['sequence_number_display'][0]),
                                 'page_width' => intval($doc['reference_image_width_s'][0]),
                                 'page_height' => intval($doc['reference_image_height_s'][0]),
-                                'page_image' => $this->cleanup_host($doc['reference_image_url_s'][0]),
+                                'page_image' => $this->cleanupHost($doc['reference_image_url_s'][0]),
                             )),
                         );
                     }
@@ -266,7 +269,7 @@ class ExploreUK
                 $url = $url[0];
             }
         }
-        $url = $this->cleanup_host($url);
+        $url = $this->cleanupHost($url);
 
         /* TODO: maybe have a metadata-determined filename? */
         $name = basename($url);
@@ -385,13 +388,13 @@ class ExploreUK
                 $flat[$key] = $value;
             } elseif (is_array($value) and count($value) > 0) {
                 if (preg_match('/_url/', $key)) {
-                    $flat[$key] = $this->cleanup_host($value[0]);
+                    $flat[$key] = $this->cleanupHost($value[0]);
                 } else {
                     $flat[$key] = $value[0];
                 }
             } elseif (isset($value)) {
                 if (preg_match('/_url/', $key)) {
-                    $flat[$key] = $this->cleanup_host($value);
+                    $flat[$key] = $this->cleanupHost($value);
                 } else {
                     $flat[$key] = $value;
                 }
@@ -431,7 +434,7 @@ class ExploreUK
                 }
             }
             if ($key === 'finding_aid_url_s' or $key === 'mets_url_display') {
-                $value = $this->cleanup_host($value);
+                $value = $this->cleanupHost($value);
                 $link = true;
             }
             if ($value) {
@@ -510,7 +513,7 @@ class ExploreUK
                     $metadata['item_audio'] = array(
                         'audio' => array(
                             'href_id' => "audio_$id",
-                            'href' => $this->cleanup_host($flat['reference_audio_url_s']),
+                            'href' => $this->cleanupHost($flat['reference_audio_url_s']),
                         ),
                     );
                     $metadata['script_media'] = true;
@@ -519,7 +522,7 @@ class ExploreUK
                     $metadata['item_audio'] = array(
                         'video' => array(
                             'href_id' => "video_$id",
-                            'href' => $this->cleanup_host($flat['reference_video_url_s']),
+                            'href' => $this->cleanupHost($flat['reference_video_url_s']),
                         ),
                     );
                     $metadata['script_media'] = true;
@@ -664,10 +667,10 @@ class ExploreUK
                     $navs = navsHashFromFlatList($facet_counts);
                     $values = array();
                     $qf = $metadata['query']->q('f');
-                    $nontrivial = FALSE;
+                    $nontrivial = false;
                     foreach ($navs as $label => $count) {
                         if (!isset($qf[$facet][$label])) {
-                            $nontrivial = TRUE;
+                            $nontrivial = true;
                             $add_link = $metadata['query']->addFilterLink($facet, $label);
                             $value_label = $label;
                             if (in_array($facet, $euk_requires_capitalization)) {
@@ -812,7 +815,7 @@ class ExploreUK
                 $metadata['pagination'] = $pagination_data;
 
                 # results
-                $docs = $this->cleanup_docs($result['response']['docs']);
+                $docs = $this->cleanupDocs($result['response']['docs']);
                 $results = array();
                 for ($i = 0; $i < count($docs); $i++) {
                     $results_data = array();
@@ -835,7 +838,7 @@ class ExploreUK
                     if (isset($results_data['thumb'])) {
                         $results_data['thumb'] = str_replace('http:', 'https:', $results_data['thumb']);
                         $results_data['thumb'] = str_replace('_tb.jpg', '_ftb.jpg', $results_data['thumb']);
-                        $results_data['thumb'] = $this->cleanup_host($results_data['thumb']);
+                        $results_data['thumb'] = $this->cleanupHost($results_data['thumb']);
                     }
                     $results_data['link'] = $this->path('/catalog/' . $docs[$i]['id'] . $metadata['query']->link());
                     $results_data['number'] = $metadata['query']->q('offset') + $i + 1;

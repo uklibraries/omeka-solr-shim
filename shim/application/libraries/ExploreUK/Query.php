@@ -35,7 +35,7 @@ class Query
                     if (!isset($this->query['f'][$subkey])) {
                         $this->query['f'][$subkey] = array();
                     }
-                    $this->query['f'][$subkey][$value] = TRUE;
+                    $this->query['f'][$subkey][$value] = true;
                 } elseif ($key == 'offset') {
                     $this->query['offset'] = intval($value);
                 } elseif ($key == 'per_page') {
@@ -310,7 +310,7 @@ class Query
                 }
                 foreach ($ary as $key => $truth) {
                     if ($key != $label) {
-                        $query['f'][$potential_term][$key] = TRUE;
+                        $query['f'][$potential_term][$key] = true;
                     }
                 }
                 if (count($query['f'][$potential_term]) == 0) {
@@ -328,7 +328,7 @@ class Query
         if (!isset($query['f'][$facet])) {
             $query['f'][$facet] = array();
         }
-        $query['f'][$facet][$label] = TRUE;
+        $query['f'][$facet][$label] = true;
         $query['offset'] = 0;
         $addFilter = new Query($query, $this->solr);
         return $addFilter->link();
